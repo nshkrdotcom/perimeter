@@ -1,6 +1,6 @@
 Of course. This is a fantastic directive. José Valim's talk provides a deep, philosophical foundation for Elixir development. Rebuilding the plan for `Perimeter` with this wisdom will elevate it from a useful utility to a truly idiomatic and powerful library that teaches Elixir best practices by its very design.
 
-The core innovation of "Defensive Boundary / Offensive Interior" remains, but we will reframe it and the library's entire structure through the lens of Valim's key principles.
+The core innovation of "Defensive Perimeter / Offensive Interior" remains, but we will reframe it and the library's entire structure through the lens of Valim's key principles.
 
 Here is the complete, ground-up plan for the `Perimeter` library, redesigned with this new foundation.
 
@@ -20,11 +20,11 @@ First, we will create a foundational document that explicitly states the library
 
 As José Valim emphasized, a design pattern describes a recurring *problem* and the *core of its solution*, which can be implemented in many ways. `Perimeter` addresses the following recurring problems:
 
-1.  **The Boundary Problem:** How do we ensure data integrity at the edge of a system (e.g., APIs, GenServers, context boundaries) without littering our core logic with defensive checks?
+1.  **The Perimeter Problem:** How do we ensure data integrity at the edge of a system (e.g., APIs, GenServers, context perimeters) without littering our core logic with defensive checks?
 2.  **The Explicitness Problem:** How do we make the data requirements of our functions and modules explicit and self-documenting, especially when working with plain maps?
 3.  **The Confidence Problem:** How can we write assertive, "let it crash" style code in our function bodies with confidence that the input data won't cause trivial crashes due to incorrect shape or type?
 
-`Perimeter` provides an idiomatic Elixir solution to these problems through **explicit, runtime-enforced contracts at system boundaries.**
+`Perimeter` provides an idiomatic Elixir solution to these problems through **explicit, runtime-enforced contracts at system perimeters.**
 
 ### Principle 2: Decouple Behavior, State, and Mutability
 
@@ -47,11 +47,11 @@ Follow this hierarchy when deciding how to implement logic:
 1.  **Simple Function & Pattern Matching:** The simplest solution. If you have a small, fixed set of known inputs, use multi-clause functions. This is the least expressive and often the best choice.
 2.  **Higher-Order Functions:** If you need to customize behavior, passing an anonymous function as an argument is a simple and powerful strategy.
 3.  **Behaviours:** When you need to define a contract with multiple, related functions (polymorphism over **behavior**), use a `behaviour`.
-4.  **`Perimeter` Contracts:** When you need to enforce a contract on the **shape and content of data** (a map or struct), especially at a system boundary, use `Perimeter`. It is more expressive than a simple function but more focused than a `protocol`.
+4.  **`Perimeter` Contracts:** When you need to enforce a contract on the **shape and content of data** (a map or struct), especially at a system perimeter, use `Perimeter`. It is more expressive than a simple function but more focused than a `protocol`.
 5.  **Protocols:** When you need polymorphism that dispatches on the built-in **data type** (e.g., making something work for `list`, `map`, and `integer`), use a `protocol`.
 6.  **Processes:** When your problem is inherently **stateful and concurrent**, model it with a process.
 
-`Perimeter`'s sweet spot is at **level 4**. It provides a formal, reusable way to define and enforce contracts on data structures, which is a problem that frequently occurs at the boundaries of large systems.
+`Perimeter`'s sweet spot is at **level 4**. It provides a formal, reusable way to define and enforce contracts on data structures, which is a problem that frequently occurs at the perimeters of large systems.
 
 ---
 
@@ -63,13 +63,13 @@ With a new philosophy, the library's public API will be refined to be clearer an
 
 # Perimeter
 
-**An implementation of the "Defensive Boundary" design pattern for Elixir.**
+**An implementation of the "Defensive Perimeter" design pattern for Elixir.**
 
-Perimeter helps you build robust applications by enforcing explicit data contracts at your system's boundaries, allowing you to write simple, assertive code in your core logic.
+Perimeter helps you build robust applications by enforcing explicit data contracts at your system's perimeters, allowing you to write simple, assertive code in your core logic.
 
 It is designed according to the principles of idiomatic Elixir: **favoring composition, decoupling behavior and state, and using the least expressive tool for the job.**
 
-## The Problem: Complexity at the Boundary
+## The Problem: Complexity at the Perimeter
 
 In any large system, modules need to exchange data. This often leads to defensive coding:
 ```elixir
@@ -86,12 +86,12 @@ end
 ```
 This code is defensive, hard to read, and mixes validation with business logic.
 
-## The Solution: The Defensive Boundary Pattern
+## The Solution: The Defensive Perimeter Pattern
 
 Perimeter allows you to solve this problem elegantly:
 
 1.  **Define a Contract:** Describe the shape of your data.
-2.  **Guard the Boundary:** Enforce the contract on your public function.
+2.  **Guard the Perimeter:** Enforce the contract on your public function.
 3.  **Write Assertive Code:** Trust the data inside your function.
 
 ```elixir
@@ -104,7 +104,7 @@ defmodule MyApp.Accounts do
     optional :name, :string
   end
 
-  # 2. Guard the boundary function
+  # 2. Guard the perimeter function
   @guard input: :create_user_params
   def create_user(params) do
     # 3. Write simple, assertive code in the "Offensive Interior"
@@ -196,8 +196,8 @@ This guide will now be structured according to the **Rule of Least Expressivenes
 1.  **Introduction: Choosing the Right Tool**
     *   Briefly explains the hierarchy: simple functions -> higher-order functions -> `Perimeter`.
 2.  **When to Use `Perimeter`**
-    *   At Application Boundaries (Phoenix, Absinthe).
-    *   At Context Boundaries.
+    *   At Application Perimeters (Phoenix, Absinthe).
+    *   At Context Perimeters.
     *   For defining complex, state-less strategies (e.g., calculation engines, formatters).
 3.  **Core Workflow: Guarding a Context**
     *   A step-by-step example of guarding `Accounts.create_user/1`.

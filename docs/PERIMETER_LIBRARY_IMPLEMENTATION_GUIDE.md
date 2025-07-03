@@ -1,8 +1,8 @@
-# Boundary Library Implementation Guide
+# Perimeter Library Implementation Guide
 
 ## Overview
 
-This guide maps the evolution from the Jido type system challenges to the innovative `boundary` library, providing a comprehensive reference for implementing the "Defensive Boundary / Offensive Interior" pattern in Elixir.
+This guide maps the evolution from the Jido type system challenges to the innovative `perimeter` library, providing a comprehensive reference for implementing the "Defensive Perimeter / Offensive Interior" pattern in Elixir.
 
 ## Document Evolution Timeline
 
@@ -12,14 +12,14 @@ This guide maps the evolution from the Jido type system challenges to the innova
 - **jido_architectural_analysis.md**: Comprehensive analysis of the architectural mismatch
 
 ### Phase 2: Innovation Design
-- **type_boundaries_design.md**: Introduction of the three-zone model
+- **type_perimeters_design.md**: Introduction of the three-zone model
 - **type_enforcement_library_spec.md**: Detailed API specifications
 - **type_relationships_formal_spec.md**: Formal type system relationships
 
 ### Phase 3: Synthesis with Elixir Best Practices
 - **type_safe_metaprogramming_patterns.md**: Integration with metaprogramming
-- **defensive_boundary_implementation.md**: Practical implementation patterns
-- **error_handling_type_safety.md**: Type-safe error boundaries
+- **defensive_perimeter_implementation.md**: Practical implementation patterns
+- **error_handling_type_safety.md**: Type-safe error perimeters
 - **migration_strategy_guide.md**: Gradual adoption path
 
 ### Phase 4: Library Evolution (Post-Valim Talk)
@@ -45,7 +45,7 @@ This guide maps the evolution from the Jido type system challenges to the innova
 ### Zone Characteristics
 
 1. **Defensive Perimeter**
-   - Strict type validation at API boundaries
+   - Strict type validation at API perimeters
    - Contract enforcement via `@guard` macro
    - Structured error generation
 
@@ -62,7 +62,7 @@ This guide maps the evolution from the Jido type system challenges to the innova
 ## Key Library Components
 
 ### 1. Contract Definition System
-- **Module**: `Boundary.Contract`
+- **Module**: `Perimeter.Contract`
 - **Key Features**:
   - `defcontract/2` macro for declarative contracts
   - `required/3` and `optional/3` field definitions
@@ -70,7 +70,7 @@ This guide maps the evolution from the Jido type system challenges to the innova
   - `validate/1` for custom validation functions
 
 ### 2. Guard Enforcement
-- **Module**: `Boundary.Guard`
+- **Module**: `Perimeter.Guard`
 - **Key Features**:
   - `@guard` attribute macro
   - Configurable enforcement levels (`:strict`, `:warn`, `:log`)
@@ -78,7 +78,7 @@ This guide maps the evolution from the Jido type system challenges to the innova
   - Compile-time function wrapping
 
 ### 3. Runtime Validation
-- **Module**: `Boundary.Validator`
+- **Module**: `Perimeter.Validator`
 - **Key Features**:
   - `validate/3` for manual validation
   - `validate!/3` for exception-raising validation
@@ -86,7 +86,7 @@ This guide maps the evolution from the Jido type system challenges to the innova
   - Structured error responses
 
 ### 4. Error Handling
-- **Module**: `Boundary.Error`
+- **Module**: `Perimeter.Error`
 - **Key Features**:
   - Structured violation tracking
   - Path-based error location
@@ -113,10 +113,10 @@ This guide maps the evolution from the Jido type system challenges to the innova
 
 ## Implementation Patterns
 
-### Pattern 1: Context Boundaries
+### Pattern 1: Context Perimeters
 ```elixir
 defmodule MyApp.Accounts do
-  use Boundary
+  use Perimeter
   
   defcontract :create_user_params do
     required :email, :string, format: ~r/@/
@@ -134,7 +134,7 @@ end
 ```elixir
 defmodule MyAppWeb.UserController do
   use MyAppWeb, :controller
-  use Boundary
+  use Perimeter
   
   plug :validate_params, contract: :create_params
   
@@ -148,7 +148,7 @@ end
 ```elixir
 defmodule MyApp.Worker do
   use GenServer
-  use Boundary
+  use Perimeter
   
   defcontract :job_params do
     required :type, :atom, in: [:sync, :async]
@@ -165,13 +165,13 @@ end
 ## Testing Strategy
 
 ### 1. Contract Testing
-- Direct validation via `Boundary.Validator`
+- Direct validation via `Perimeter.Validator`
 - Property-based testing for contract coverage
 - Contract composition verification
 
 ### 2. Guard Testing
 - Happy path validation
-- Error boundary testing
+- Error perimeter testing
 - Enforcement level verification
 
 ### 3. Integration Testing
@@ -200,7 +200,7 @@ end
 
 ### For Existing Applications
 1. Start with `:log` enforcement
-2. Identify critical boundaries
+2. Identify critical perimeters
 3. Write shadow contracts
 4. Fix upstream issues
 5. Progress to `:warn` then `:strict`
@@ -228,20 +228,20 @@ end
 ## References for Implementation
 
 ### Essential Reading Order
-1. `type_boundaries_design.md` - Core innovation
+1. `type_perimeters_design.md` - Core innovation
 2. `PERIMETER_gem_0010.md` - Philosophical foundation
-3. `defensive_boundary_implementation.md` - Practical patterns
+3. `defensive_perimeter_implementation.md` - Practical patterns
 4. `ELIXIR_1_20_0_DEV_ANTIPATTERNS.md` - Problems being solved
 
 ### Module-Specific References
 - **Contract System**: `type_enforcement_library_spec.md`
-- **Guard System**: `defensive_boundary_implementation.md`
+- **Guard System**: `defensive_perimeter_implementation.md`
 - **Error Handling**: `error_handling_type_safety.md`
 - **Testing**: `PERIMETER_gem_0003.md`
 
 ## Final Implementation Notes
 
-The `boundary` library represents a synthesis of:
+The `perimeter` library represents a synthesis of:
 1. Solutions to real dialyzer issues in complex frameworks
 2. Elixir community best practices and anti-pattern avoidance
 3. José Valim's design principles for idiomatic Elixir

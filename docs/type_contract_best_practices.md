@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide establishes best practices for defining and using type contracts in Elixir, focusing on avoiding common antipatterns while maintaining code clarity and performance. These practices build upon the "Defensive Boundary / Offensive Interior" pattern to create maintainable, type-safe systems.
+This guide establishes best practices for defining and using type contracts in Elixir, focusing on avoiding common antipatterns while maintaining code clarity and performance. These practices build upon the "Defensive Perimeter / Offensive Interior" pattern to create maintainable, type-safe systems.
 
 ## Contract Definition Best Practices
 
@@ -135,7 +135,7 @@ defmodule DomainContracts do
     required :status, :atom, in: [:pending, :completed, :failed]
     required :currency, :string, length: 3
   end
-end
+}
 ```
 
 ## Contract Validation Patterns
@@ -557,7 +557,7 @@ end
 
 1. **Be Explicit**: Define clear contracts that express intent
 2. **Compose, Don't Repeat**: Build complex contracts from simple ones
-3. **Fail Fast**: Validate at boundaries with clear error messages
+3. **Fail Fast**: Validate at perimeters with clear error messages
 4. **Trust the Interior**: Don't re-validate already validated data
 5. **Optimize Wisely**: Use compile-time optimization and caching
 6. **Document Well**: Self-documenting contracts with examples

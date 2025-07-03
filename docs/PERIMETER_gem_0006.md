@@ -12,9 +12,9 @@ Thank you for your interest in contributing to Perimeter! We welcome contributio
 
 ## Guiding Philosophy
 
-Perimeter is built on the **"Defensive Boundary / Offensive Interior"** pattern. All contributions should align with this core philosophy:
+Perimeter is built on the **"Defensive Perimeter / Offensive Interior"** pattern. All contributions should align with this core philosophy:
 
-1.  **Boundaries are for Safety:** The library's features should focus on making it easier and more effective to validate data at the edges of a system.
+1.  **Perimeters are for Safety:** The library's features should focus on making it easier and more effective to validate data at the edges of a system.
 2.  **The Interior is for Freedom:** We intentionally avoid adding features that would constrain or inspect code *inside* a guarded function.
 3.  **Clarity and Explicitness:** Contracts and guards should be easy to read and understand. The DSL should be declarative and expressive.
 4.  **Performance Matters:** Because this is a runtime library, performance is a key consideration. Changes should be benchmarked where appropriate.
@@ -74,7 +74,7 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 ### Added
 - Initial release of the `Perimeter` library.
 - `Perimeter.Contract` module with `defcontract/2`, `required/3`, `optional/3`, `validate/1`, and `compose/1` macros for defining data contracts.
-- `Perimeter.Guard` module with the `@guard/1` macro for enforcing contracts on function boundaries.
+- `Perimeter.Guard` module with the `@guard/1` macro for enforcing contracts on function perimeters.
 - `Perimeter.Validator` module with a public API (`validate/3` and `validate!/3`) for manual validation.
 - `Perimeter.Error` and `Perimeter.ValidationError` structs for structured error handling.
 - Configuration system for setting enforcement levels (`:strict`, `:warn`, `:log`) via `config.exs`.

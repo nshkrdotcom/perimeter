@@ -1,8 +1,8 @@
-# Migration Strategy Guide: From Traditional Elixir to Type-Safe Boundaries
+# Migration Strategy Guide: From Traditional Elixir to Type-Safe Perimeters
 
 ## Overview
 
-This guide provides a comprehensive strategy for migrating existing Elixir applications to use the "Defensive Boundary / Offensive Interior" pattern. The migration is designed to be gradual, allowing teams to adopt type contracts incrementally while maintaining system stability.
+This guide provides a comprehensive strategy for migrating existing Elixir applications to use the "Defensive Perimeter / Offensive Interior" pattern. The migration is designed to be gradual, allowing teams to adopt type contracts incrementally while maintaining system stability.
 
 ## Migration Phases
 
@@ -25,18 +25,18 @@ defmodule MigrationAssessment do
       agents: count_pattern(modules, &uses?(&1, Jido.Agent)),
       genservers: count_pattern(modules, &uses?(&1, GenServer)),
       phoenix_controllers: count_pattern(modules, &uses?(&1, Phoenix.Controller)),
-      boundary_candidates: identify_boundary_modules(modules),
+      perimeter_candidates: identify_perimeter_modules(modules),
       antipattern_risks: scan_for_antipatterns(modules)
     }
   end
   
-  defp identify_boundary_modules(modules) do
+  defp identify_perimeter_modules(modules) do
     modules
-    |> Enum.filter(&is_boundary_module?/1)
+    |> Enum.filter(&is_perimeter_module?/1)
     |> Enum.map(&module_info/1)
   end
   
-  defp is_boundary_module?(module) do
+  defp is_perimeter_module?(module) do
     # Modules that interact with external systems
     exports = module.__info__(:functions)
     
@@ -57,10 +57,10 @@ defp deps do
   [
     # Existing deps...
     {:jido_type_enforcement, "~> 1.0"},
-    {:jido_boundary_guard, "~> 1.0"},
+    {:jido_perimeter_guard, "~> 1.0"},
     
     # Development tools
-    {:boundary, "~> 0.10", runtime: false},
+    {:perimeter, "~> 0.10", runtime: false},
     {:credo_type_check, "~> 1.0", only: [:dev, :test]}
   ]
 end
@@ -96,7 +96,7 @@ defmodule MyApp.TypeMigration do
     level = Keyword.get(opts, :level, :log)
     
     quote do
-      use Jido.BoundaryGuard, enforcement: unquote(level)
+      use Jido.PerimeterGuard, enforcement: unquote(level)
       use Jido.TypeContract
       
       # Migration helper to wrap existing functions
@@ -124,7 +124,7 @@ defmodule MyApp.TypeMigration do
 end
 ```
 
-### Phase 2: Identify and Migrate Boundaries
+### Phase 2: Identify and Migrate Perimeters
 
 #### Step 1: Start with External Interfaces
 
@@ -188,15 +188,15 @@ defmodule MyApp.DataProcessor do
 end
 ```
 
-#### Step 2: Migrate Internal Boundaries
+#### Step 2: Migrate Internal Perimeters
 
-Focus on module boundaries that cross contexts:
+Focus on module perimeters that cross contexts:
 
 ```elixir
 defmodule MyApp.Accounts do
   use MyApp.TypeMigration
   
-  # Define contracts for context boundaries
+  # Define contracts for context perimeters
   defcontract :create_user_attrs do
     required :email, :string
     required :password, :string
@@ -218,7 +218,7 @@ defmodule MyApp.Accounts do
   end
   
   # Gradually update callers to use validated version
-end
+}
 ```
 
 ### Phase 3: Address Antipatterns
@@ -292,7 +292,7 @@ defmodule MigrationMonitor do
   def init(_) do
     :telemetry.attach(
       "migration-monitor",
-      [:jido, :boundary, :violation],
+      [:jido, :perimeter, :violation],
       &handle_violation/4,
       nil
     )
@@ -511,9 +511,9 @@ defmodule MigrationTimeline do
   @timeline [
     {0, "Setup infrastructure, add dependencies"},
     {1, "Migrate external APIs (controllers, webhooks)"},
-    {2, "Migrate GenServers and process boundaries"},
+    {2, "Migrate GenServers and process perimeters"},
     {3, "Fix non-assertive patterns in critical paths"},
-    {4, "Migrate internal module boundaries"},
+    {4, "Migrate internal module perimeters"},
     {5, "Address remaining antipatterns"},
     {6, "Increase enforcement to :warn"},
     {8, "Selective :strict enforcement"},
@@ -526,8 +526,8 @@ defmodule MigrationTimeline do
     scaling_factor = module_count / 100
     
     base_weeks + (scaling_factor * 2)
-  end
-end
+  }
+}
 ```
 
 ## Post-Migration Best Practices
@@ -584,7 +584,7 @@ end
 
 ## Conclusion
 
-Successful migration to type-safe boundaries requires:
+Successful migration to type-safe perimeters requires:
 
 1. **Gradual Approach**: Start with logging, increase enforcement over time
 2. **Team Buy-in**: Education and clear benefits demonstration
@@ -597,4 +597,4 @@ The migration process typically takes 3-6 months for medium-sized applications, 
 - Better documentation through contracts
 - Easier onboarding for new developers
 - More confident refactoring
-- Clear system boundaries
+- Clear system perimeters

@@ -2,13 +2,13 @@
 
 ## Overview
 
-This guide synthesizes the innovative "Defensive Boundary / Offensive Interior" pattern with Elixir's idioms to create type-safe metaprogramming practices that avoid common antipatterns while preserving the language's dynamic power.
+This guide synthesizes the innovative "Defensive Perimeter / Offensive Interior" pattern with Elixir's idioms to create type-safe metaprogramming practices that avoid common antipatterns while preserving the language's dynamic power.
 
-## Core Principle: Assertive Boundaries, Dynamic Interiors
+## Core Principle: Assertive Perimeters, Dynamic Interiors
 
-The fundamental insight is that type safety in Elixir doesn't require abandoning metaprogramming. Instead, we establish **assertive type boundaries** around **dynamic interiors**, creating zones where different rules apply:
+The fundamental insight is that type safety in Elixir doesn't require abandoning metaprogramming. Instead, we establish **assertive type perimeters** around **dynamic interiors**, creating zones where different rules apply:
 
-1. **Boundary Zone**: Strict validation, pattern matching, and type contracts
+1. **Perimeter Zone**: Strict validation, pattern matching, and type contracts
 2. **Interior Zone**: Full metaprogramming freedom with runtime guarantees
 
 This approach directly addresses the antipatterns of non-assertive programming while enabling powerful dynamic features.
@@ -99,7 +99,7 @@ defmodule Jido.ActionRegistry do
   def dispatch(name, params, context) when is_binary(name) do
     case lookup_action(name) do
       {:ok, module} ->
-        # Boundary crossed - now in validated interior
+        # Perimeter crossed - now in validated interior
         Jido.Exec.run(module, params, context)
       :error ->
         {:error, Jido.Error.not_found("Action not registered", %{name: name})}
@@ -168,11 +168,11 @@ defmodule MyAction do
 end
 ```
 
-## Pattern 4: Boundary-Enforced Metaprogramming
+## Pattern 4: Perimeter-Enforced Metaprogramming
 
 ### Antipattern Avoided: Complex else Clauses in with
 
-Instead of complex error handling, we normalize at boundaries:
+Instead of complex error handling, we normalize at perimeters:
 
 ```elixir
 defmodule Jido.Workflow do
@@ -219,7 +219,7 @@ defmodule Jido.Workflow do
   end
   
   defp execute_step(step, input) do
-    # Boundary enforcement before action execution
+    # Perimeter enforcement before action execution
     transformed = step.input_transform.(input)
     
     case Jido.Exec.run(step.action, transformed, %{}) do
@@ -234,7 +234,7 @@ end
 
 ### Combining Multiple Patterns
 
-This example shows how to combine assertive boundaries with dynamic code generation:
+This example shows how to combine assertive perimeters with dynamic code generation:
 
 ```elixir
 defmodule Jido.GenerateStateMachine do
@@ -270,7 +270,7 @@ defmodule Jido.GenerateStateMachine do
       defmodule unquote(name) do
         use GenServer
         
-        # Type contracts for runtime boundaries
+        # Type contracts for runtime perimeters
         use Jido.TypeContract
         
         defcontract :state do
@@ -279,7 +279,7 @@ defmodule Jido.GenerateStateMachine do
           required :history, {:list, :atom}
         end
         
-        # Generated functions with boundary guards
+        # Generated functions with perimeter guards
         unquote_splicing(event_functions)
         
         # Assertive state access
@@ -347,11 +347,11 @@ def process(user) do
 end
 ```
 
-### 3. Separate Boundary Validation from Interior Logic
+### 3. Separate Perimeter Validation from Interior Logic
 
 ```elixir
 defmodule MyAction do
-  # Boundary: strict validation
+  # Perimeter: strict validation
   @guard input: :user_input
   def run(params, context) do
     # Interior: work with validated data
@@ -383,7 +383,7 @@ defmodule SharedContracts do
 end
 ```
 
-### 5. Provide Clear Error Messages at Boundaries
+### 5. Provide Clear Error Messages at Perimeters
 
 ```elixir
 def create_action(params) do
@@ -405,12 +405,14 @@ end
 
 ## Conclusion
 
-By combining the "Defensive Boundary / Offensive Interior" pattern with Elixir's existing idioms, we can write code that is both type-safe and dynamically powerful. The key is to:
+By combining the "Defensive Perimeter / Offensive Interior" pattern with Elixir's existing idioms, we can w ```change all variations of perimeter in the doc to the same     │
+│    variation of perimeter, and rename any doc name with a varation of perimeter wiht the apporpriate         │
+│    variation of perinmeterrite code that is both type-safe and dynamically powerful. The key is to:
 
-1. **Be assertive at boundaries** - Use pattern matching, guards, and contracts
+1. **Be assertive at perimeters** - Use pattern matching, guards, and contracts
 2. **Validate early** - Catch errors at compile-time when possible
 3. **Trust the interior** - Once validated, use Elixir's full power
 4. **Make contracts explicit** - Clear, reusable type definitions
 5. **Fail fast and clearly** - Provide actionable error messages
 
-This approach gives us the best of both worlds: the safety of typed systems at boundaries and the flexibility of dynamic metaprogramming in our implementation.
+This approach gives us the best of both worlds: the safety of typed systems at perimeters and the flexibility of dynamic metaprogramming in our implementation.````

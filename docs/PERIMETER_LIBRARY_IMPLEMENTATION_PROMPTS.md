@@ -1,19 +1,19 @@
-# Boundary Library Implementation Prompts
+# Perimeter Library Implementation Prompts
 
 ## Overview
-This document contains a series of incremental prompts for implementing the `boundary` library. Each prompt is self-contained, includes all necessary context, and has clear success metrics.
+This document contains a series of incremental prompts for implementing the `perimeter` library. Each prompt is self-contained, includes all necessary context, and has clear success metrics.
 
 ---
 
 ## Prompt 1: Core Contract DSL Foundation
 
 ### Context
-You are implementing the `boundary` library for Elixir, which provides runtime type validation at system boundaries. Read these references:
-- **Primary**: `BOUNDARY_LIBRARY_IMPLEMENTATION_GUIDE.md` sections "Core Innovation" and "Key Library Components"
+You are implementing the `perimeter` library for Elixir, which provides runtime type validation at system perimeters. Read these references:
+- **Primary**: `PERIMETER_LIBRARY_IMPLEMENTATION_GUIDE.md` sections "Core Innovation" and "Key Library Components"
 - **Secondary**: `type_enforcement_library_spec.md` section on `Jido.TypeContract`
 
 ### Task
-Implement the basic contract definition DSL in `lib/boundary/contract.ex`:
+Implement the basic contract definition DSL in `lib/perimeter/contract.ex`:
 
 1. Create the `defcontract/2` macro that:
    - Accepts a name (atom) and a do block
@@ -31,7 +31,7 @@ Implement the basic contract definition DSL in `lib/boundary/contract.ex`:
 ```elixir
 # This should compile without warnings:
 defmodule TestContract do
-  use Boundary.Contract
+  use Perimeter.Contract
   
   defcontract :user do
     required :name, :string
@@ -54,15 +54,15 @@ TestContract.__contract__(:user)
 
 ### Context
 Building on Prompt 1's contract DSL. Read these references:
-- **Primary**: `defensive_boundary_implementation.md` section "Contract Validation Engine"
+- **Primary**: `defensive_perimeter_implementation.md` section "Contract Validation Engine"
 - **Secondary**: `type_contract_best_practices.md` section "Fail Fast with Clear Messages"
 
 ### Task
-Implement the validation engine in `lib/boundary/validator.ex`:
+Implement the validation engine in `lib/perimeter/validator.ex`:
 
 1. Create `validate/3` function that:
    - Takes module, contract name, and data map
-   - Returns `{:ok, data}` or `{:error, %Boundary.Error{}}`
+   - Returns `{:ok, data}` or `{:error, %Perimeter.Error{}}`
    - Validates required fields exist
    - Validates optional fields if present
    - Checks basic type constraints
@@ -74,24 +74,24 @@ Implement the validation engine in `lib/boundary/validator.ex`:
    - `:atom` - `is_atom/1`
    - `:map` - `is_map/1`
 
-3. Create `Boundary.Error` struct with:
+3. Create `Perimeter.Error` struct with:
    - `violations` list
    - Each violation has: `field`, `error`, `value`, `path`
 
 ### Success Metrics
 ```elixir
 # Valid data passes:
-{:ok, _} = Boundary.Validator.validate(TestContract, :user, %{name: "John"})
+{:ok, _} = Perimeter.Validator.validate(TestContract, :user, %{name: "John"})
 
 # Invalid data fails with structured error:
-{:error, %Boundary.Error{violations: [
+{:error, %Perimeter.Error{violations: [
   %{field: :name, error: "is required"}
-]}} = Boundary.Validator.validate(TestContract, :user, %{})
+]}} = Perimeter.Validator.validate(TestContract, :user, %{})
 
 # Type mismatch caught:
-{:error, %Boundary.Error{violations: [
+{:error, %Perimeter.Error{violations: [
   %{field: :name, error: "expected string, got integer"}
-]}} = Boundary.Validator.validate(TestContract, :user, %{name: 123})
+]}} = Perimeter.Validator.validate(TestContract, :user, %{name: 123})
 ```
 
 ### Manual Verification
@@ -129,7 +129,7 @@ Add constraint validation to the validator:
 ### Success Metrics
 ```elixir
 defmodule ConstraintTest do
-  use Boundary.Contract
+  use Perimeter.Contract
   
   defcontract :validated do
     required :email, :string, format: ~r/@/
@@ -162,11 +162,11 @@ end
 
 ### Context
 Implementing the `@guard` attribute macro. Read:
-- **Primary**: `defensive_boundary_implementation.md` section "Boundary Guard Module"
+- **Primary**: `defensive_perimeter_implementation.md` section "Perimeter Guard Module"
 - **Secondary**: `PERIMETER_gem_0002.md` section on guard mechanics
 
 ### Task
-Create `lib/boundary/guard.ex` with:
+Create `lib/perimeter/guard.ex` with:
 
 1. Basic `@guard` attribute that:
    - Stores guard configuration
@@ -176,14 +176,14 @@ Create `lib/boundary/guard.ex` with:
    - Intercepts the original function
    - Validates first argument against input contract
    - Calls original function if valid
-   - Returns `{:error, %Boundary.Error{}}` if invalid
+   - Returns `{:error, %Perimeter.Error{}}` if invalid
 
 3. Support `:input` option only (not `:output` yet)
 
 ### Success Metrics
 ```elixir
 defmodule GuardedModule do
-  use Boundary
+  use Perimeter
   
   defcontract :params do
     required :id, :integer
@@ -199,7 +199,7 @@ end
 {:ok, 10} = GuardedModule.process(%{id: 5})
 
 # Invalid input caught:
-{:error, %Boundary.Error{}} = GuardedModule.process(%{id: "not-an-int"})
+{:error, %Perimeter.Error{}} = GuardedModule.process(%{id: "not-an-int"})
 ```
 
 ### Manual Verification
@@ -222,7 +222,7 @@ Implement enforcement level system:
 
 1. Add configuration:
    ```elixir
-   config :boundary, enforcement_level: :strict
+   config :perimeter, enforcement_level: :strict
    ```
 
 2. Support three levels:
@@ -235,23 +235,23 @@ Implement enforcement level system:
    @guard input: :params, enforcement: :log
    ```
 
-4. Create `Boundary.Config` module for runtime configuration
+4. Create `Perimeter.Config` module for runtime configuration
 
 ### Success Metrics
 ```elixir
 # With :log enforcement
-Application.put_env(:boundary, :enforcement_level, :log)
+Application.put_env(:perimeter, :enforcement_level, :log)
 
 # Invalid data logs but continues:
 capture_log(fn ->
   {:ok, nil} = GuardedModule.process(%{})  # Function runs despite invalid data
-end) =~ "Boundary contract violation"
+end) =~ "Perimeter contract violation"
 
 # With :strict enforcement
-Application.put_env(:boundary, :enforcement_level, :strict)
+Application.put_env(:perimeter, :enforcement_level, :strict)
 
 # Invalid data returns error:
-{:error, %Boundary.Error{}} = GuardedModule.process(%{})
+{:error, %Perimeter.Error{}} = GuardedModule.process(%{})
 ```
 
 ### Manual Verification
@@ -267,7 +267,7 @@ Application.put_env(:boundary, :enforcement_level, :strict)
 ### Context
 Supporting nested data structures. Read:
 - **Primary**: `type_contract_best_practices.md` section "Use Composition"
-- **Secondary**: Nested contract examples in `BOUNDARY_LIBRARY_IMPLEMENTATION_GUIDE.md`
+- **Secondary**: Nested contract examples in `PERIMETER_LIBRARY_IMPLEMENTATION_GUIDE.md`
 
 ### Task
 Add support for nested contracts:
@@ -335,7 +335,7 @@ end
 ### Context
 Adding custom validation functions. Read:
 - **Primary**: `type_contract_best_practices.md` section "Separate Validation from Business Logic"
-- **Secondary**: `defensive_boundary_implementation.md` Custom validator examples 
+- **Secondary**: `defensive_perimeter_implementation.md` Custom validator examples 
 
 ### Task
 Implement custom validation support:
@@ -360,7 +360,7 @@ Implement custom validation support:
 ### Success Metrics
 ```elixir
 defmodule CustomTest do
-  use Boundary.Contract
+  use Perimeter.Contract
   
   defcontract :registration do
     required :password, :string, min_length: 8
@@ -399,7 +399,7 @@ end
 ### Context
 Implementing contract reuse. Read:
 - **Primary**: `type_contract_best_practices.md` section "Compose, Don't Repeat"
-- **Secondary**: `BOUNDARY_LIBRARY_IMPLEMENTATION_GUIDE.md` Examples of shared contracts
+- **Secondary**: `PERIMETER_LIBRARY_IMPLEMENTATION_GUIDE.md` Examples of shared contracts
 
 ### Task
 Add `compose/1` macro for contract composition:
@@ -419,7 +419,7 @@ Add `compose/1` macro for contract composition:
 ### Success Metrics
 ```elixir
 defmodule SharedContracts do
-  use Boundary.Contract
+  use Perimeter.Contract
   
   defcontract :timestamps do
     required :inserted_at, :datetime
@@ -428,7 +428,7 @@ defmodule SharedContracts do
 end
 
 defmodule UserContracts do
-  use Boundary.Contract
+  use Perimeter.Contract
   import SharedContracts
   
   defcontract :user do
@@ -461,15 +461,15 @@ end
 
 ### Context
 Creating Phoenix-specific helpers. Read:
-- **Primary**: `greenfield_architecture.md` section "Build the Web Boundary"
-- **Secondary**: `BOUNDARY_LIBRARY_IMPLEMENTATION_GUIDE.md` Phoenix controller examples
+- **Primary**: `greenfield_architecture.md` section "Build the Web Perimeter"
+- **Secondary**: `PERIMETER_LIBRARY_IMPLEMENTATION_GUIDE.md` Phoenix controller examples
 
 ### Task
-Create `lib/boundary/phoenix.ex` with:
+Create `lib/perimeter/phoenix.ex` with:
 
 1. Plug for parameter validation:
    ```elixir
-   plug Boundary.Phoenix.ValidateParams, contract: :create_user
+   plug Perimeter.Phoenix.ValidateParams, contract: :create_user
    ```
 
 2. FallbackController helper for errors
@@ -480,9 +480,9 @@ Create `lib/boundary/phoenix.ex` with:
 ```elixir
 defmodule TestController do
   use Phoenix.Controller
-  use Boundary
+  use Perimeter
   
-  plug Boundary.Phoenix.ValidateParams, 
+  plug Perimeter.Phoenix.ValidateParams, 
     contract: :create_params when action == :create
   
   defcontract :create_params do
@@ -493,7 +493,7 @@ defmodule TestController do
   
   def create(conn, _params) do
     # Validated params available
-    validated = conn.assigns.boundary_params
+    validated = conn.assigns.perimeter_params
     json(conn, %{email: validated.user.email})
   end
 end
@@ -518,7 +518,7 @@ assert conn.resp_body =~ "email is required"
 ### Context
 Creating comprehensive documentation. Read:
 - **Primary**: All PERIMETER_gem_* files for structure
-- **Secondary**: `BOUNDARY_LIBRARY_IMPLEMENTATION_GUIDE.md`
+- **Secondary**: `PERIMETER_LIBRARY_IMPLEMENTATION_GUIDE.md`
 
 ### Task
 Create documentation:
@@ -560,8 +560,8 @@ mix test --only doctest
 
 ### Context
 Optimizing for production use. Read:
-- **Primary**: `defensive_boundary_implementation.md` section "Performance Optimization"
-- **Secondary**: `BOUNDARY_CACHING_STRATEGIES.md` Caching strategies
+- **Primary**: `defensive_perimeter_implementation.md` section "Performance Optimization"
+- **Secondary**: `PERIMETER_CACHING_STRATEGIES.md` Caching strategies
 
 ### Task
 Add performance optimizations:
@@ -575,16 +575,16 @@ Add performance optimizations:
 ```elixir
 # Benchmark shows < 1% overhead:
 Benchee.run(%{
-  "without_boundary" => fn -> 
+  "without_perimeter" => fn -> 
     MyModule.unguarded_function(%{id: 1})
   end,
-  "with_boundary" => fn ->
+  "with_perimeter" => fn ->
     MyModule.guarded_function(%{id: 1})
   end
 })
 
 # Results show minimal overhead:
-# with_boundary is at most 1.01x slower than without_boundary
+# with_perimeter is at most 1.01x slower than without_perimeter
 ```
 
 ### Manual Verification
@@ -600,7 +600,7 @@ Benchee.run(%{
 ### Context
 Ensuring everything works together. Read:
 - **Primary**: Testing sections from all guides
-- **Secondary**: `BOUNDARY_LIBRARY_IMPLEMENTATION_GUIDE.md` success metrics
+- **Secondary**: `PERIMETER_LIBRARY_IMPLEMENTATION_GUIDE.md` success metrics
 
 ### Task
 Create comprehensive integration tests:

@@ -10,7 +10,7 @@ This document will be the capstone, tying everything together and showing develo
 
 This guide presents an architectural blueprint for building new, "greenfield" Elixir applications using `Perimeter` from the very beginning. By adopting these patterns, you can create a system that is robust, maintainable, and idiomatic from day one.
 
-The architecture is built around two core concepts: **Phoenix as the Web Boundary** and **Contexts as the Domain Boundary**.
+The architecture is built around two core concepts: **Phoenix as the Web Perimeter** and **Contexts as the Domain Perimeter**.
 
 ## The Core Architecture
 
@@ -21,12 +21,12 @@ A `Perimeter`-driven application consists of three primary layers:
 |                           1. The Web Layer                        |
 |        (Phoenix: Controllers, LiveViews, Channels, Plugs)         |
 |                                                                   |
-|   <-- Perimeter Guards at this Boundary (Validates raw input) --> |
+|   <-- Perimeter Guards at this Perimeter (Validates raw input) --> |
 +-------------------------------------------------------------------+
 |                         2. The Domain Layer                       |
 |           (Core Contexts: Accounts, Sales, Shipping)              |
 |                                                                   |
-|  <-- Perimeter Guards at this Boundary (Ensures domain integrity) |
+|  <-- Perimeter Guards at this Perimeter (Ensures domain integrity) |
 +-------------------------------------------------------------------+
 |                         3. The Data Layer                         |
 |                       (Ecto Schemas and Repos)                    |
@@ -81,7 +81,7 @@ defmodule MyApp.Accounts do
   alias MyApp.Repo
 
   # Guard the public function of your context.
-  # This is the INNER boundary. It protects your domain logic.
+  # This is the INNER perimeter. It protects your domain logic.
   @guard input: Contracts.create_user_params, output: Contracts.user_output
   def create_user(params) do
     # Inside here, `params` are guaranteed to be valid.
@@ -94,7 +94,7 @@ end
 ```
 By defining contracts alongside your context, you create a self-documenting, testable, and robust domain layer *before* any web code exists.
 
-### Step 2: Build the Web Boundary with Phoenix
+### Step 2: Build the Web Perimeter with Phoenix
 
 Now, build the web interface that interacts with your domain.
 
@@ -110,7 +110,7 @@ defmodule MyAppWeb.UserController do
 
   def create(conn, validated_params) do
     # The `validated_params` have already been checked by the plug.
-    # This is the OUTER boundary. It protects your web layer from bad HTTP requests.
+    # This is the OUTER perimeter. It protects your web layer from bad HTTP requests.
     case Accounts.create_user(validated_params) do
       {:ok, user} ->
         conn
@@ -209,7 +209,7 @@ end
 ```
 This architecture creates a system that is:
 -   **Decoupled:** The web layer doesn't know how the domain works, and the domain doesn't know how notifications are sent.
--   **Explicit:** Contracts at every boundary make data flow obvious.
+-   **Explicit:** Contracts at every perimeter make data flow obvious.
 -   **Testable:** Each layer can be tested in isolation. You can test the domain context without needing a simulated web request. You can test a notifier strategy without needing a full user object.
 -   **Resilient:** Invalid data is stopped at the earliest possible moment, protecting your core logic.
 

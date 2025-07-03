@@ -1,19 +1,19 @@
-# Defensive Boundary Implementation Guide
+# Defensive Perimeter Implementation Guide
 
 ## Introduction
 
-This guide provides practical implementation patterns for the "Defensive Boundary / Offensive Interior" approach in Elixir applications. It shows how to build robust type boundaries while avoiding common antipatterns and maintaining Elixir's idiomatic style.
+This guide provides practical implementation patterns for the "Defensive Perimeter / Offensive Interior" approach in Elixir applications. It shows how to build robust type perimeters while avoiding common antipatterns and maintaining Elixir's idiomatic style.
 
 ## Core Implementation Components
 
-### 1. Boundary Guard Module
+### 1. Perimeter Guard Module
 
-The foundation of defensive boundaries is a robust guard system that validates data at entry points:
+The foundation of defensive perimeters is a robust guard system that validates data at entry points:
 
 ```elixir
-defmodule Jido.BoundaryGuard do
+defmodule Jido.PerimeterGuard do
   @moduledoc """
-  Provides compile-time and runtime boundary enforcement for type contracts.
+  Provides compile-time and runtime perimeter enforcement for type contracts.
   Implements the three-zone model: Defensive Perimeter, Transition Layer, and Offensive Interior.
   """
   
@@ -21,16 +21,16 @@ defmodule Jido.BoundaryGuard do
     enforcement_level = Keyword.get(opts, :enforcement, :strict)
     
     quote do
-      import Jido.BoundaryGuard
-      Module.register_attribute(__MODULE__, :boundary_contracts, accumulate: true)
+      import Jido.PerimeterGuard
+      Module.register_attribute(__MODULE__, :perimeter_contracts, accumulate: true)
       Module.register_attribute(__MODULE__, :enforcement_level, persist: true)
       @enforcement_level unquote(enforcement_level)
-      @before_compile Jido.BoundaryGuard
+      @before_compile Jido.PerimeterGuard
     end
   end
   
   defmacro __before_compile__(env) do
-    contracts = Module.get_attribute(env.module, :boundary_contracts)
+    contracts = Module.get_attribute(env.module, :perimeter_contracts)
     
     # Generate runtime validation functions
     validations = Enum.map(contracts, fn {function, contract} ->
@@ -44,7 +44,7 @@ defmodule Jido.BoundaryGuard do
   
   defmacro guard(opts) do
     quote do
-      @boundary_contracts {unquote(opts[:function]), unquote(opts)}
+      @perimeter_contracts {unquote(opts[:function]), unquote(opts)}
     end
   end
   
@@ -66,11 +66,11 @@ defmodule Jido.BoundaryGuard do
           # Offensive Interior: Execute with validated data
           result = super(normalized_params, validated_context)
           
-          # Exit Boundary: Validate output
+          # Exit Perimeter: Validate output
           validate_and_wrap_output(unquote(output_contract), result)
         else
           {:error, violations} ->
-            handle_boundary_violation(violations, @enforcement_level)
+            handle_perimeter_violation(violations, @enforcement_level)
         end
       end
     end
@@ -153,12 +153,12 @@ end
 
 ### 3. Transition Layer Implementation
 
-The transition layer handles data normalization between boundaries and interior:
+The transition layer handles data normalization between perimeters and interior:
 
 ```elixir
 defmodule Jido.TransitionLayer do
   @moduledoc """
-  Handles type transformation and normalization at boundary crossings.
+  Handles type transformation and normalization at perimeter crossings.
   Ensures data is in the correct shape for interior processing.
   """
   
@@ -256,7 +256,7 @@ defmodule Jido.Runtime.Enforcement do
     # Emit telemetry event if enabled
     if state.telemetry_enabled do
       :telemetry.execute(
-        [:jido, :boundary, :violation],
+        [:jido, :perimeter, :violation],
         %{count: 1},
         %{module: module, level: level}
       )
@@ -289,12 +289,12 @@ end
 
 ### 5. Practical Action Implementation
 
-Here's how to implement an action with proper boundary enforcement:
+Here's how to implement an action with proper perimeter enforcement:
 
 ```elixir
 defmodule MyApp.Actions.CreateUser do
   use Jido.Action
-  use Jido.BoundaryGuard, enforcement: :strict
+  use Jido.PerimeterGuard, enforcement: :strict
   use Jido.TypeContract
   
   # Define input contract
@@ -329,7 +329,7 @@ defmodule MyApp.Actions.CreateUser do
          {:ok, _} <- send_welcome_email(user),
          {:ok, _} <- emit_user_created_event(user) do
       
-      # Output will be validated by boundary guard
+      # Output will be validated by perimeter guard
       {:ok, %{
         id: user.id,
         user: user,
@@ -355,14 +355,14 @@ defmodule MyApp.Actions.CreateUser do
 end
 ```
 
-### 6. Agent with Boundary Protection
+### 6. Agent with Perimeter Protection
 
-Implement an agent with proper state boundaries:
+Implement an agent with proper state perimeters:
 
 ```elixir
 defmodule MyApp.Agents.DataProcessor do
   use Jido.Agent
-  use Jido.BoundaryGuard
+  use Jido.PerimeterGuard
   use Jido.TypeContract
   
   # State contract ensures state integrity
@@ -395,7 +395,7 @@ defmodule MyApp.Agents.DataProcessor do
   @impl true
   @guard function: :on_before_plan, input: :instruction
   def on_before_plan(agent, instruction, params) do
-    # Validate instruction at boundary
+    # Validate instruction at perimeter
     {:ok, agent}
   end
   
@@ -426,20 +426,20 @@ defmodule MyApp.Agents.DataProcessor do
 end
 ```
 
-### 7. Error Boundary Handling
+### 7. Error Perimeter Handling
 
-Implement proper error handling at boundaries:
+Implement proper error handling at perimeters:
 
 ```elixir
-defmodule Jido.ErrorBoundary do
+defmodule Jido.ErrorPerimeter do
   @moduledoc """
-  Handles errors at type boundaries with proper context and recovery.
+  Handles errors at type perimeters with proper context and recovery.
   """
   
-  def handle_boundary_violation(violations, enforcement_level) do
+  def handle_perimeter_violation(violations, enforcement_level) do
     error = %Jido.Error{
       type: :validation_error,
-      message: "Contract violation at boundary",
+      message: "Contract violation at perimeter",
       details: %{
         violations: format_violations(violations),
         enforcement_level: enforcement_level
@@ -450,10 +450,10 @@ defmodule Jido.ErrorBoundary do
     case enforcement_level do
       :strict -> {:error, error}
       :warn -> 
-        Logger.warning("Boundary violation: #{inspect(error)}")
+        Logger.warning("Perimeter violation: #{inspect(error)}")
         :ok
       :log ->
-        Logger.debug("Boundary violation: #{inspect(error)}")
+        Logger.debug("Perimeter violation: #{inspect(error)}")
         :ok
       :none ->
         :ok
@@ -486,7 +486,7 @@ end
 ```elixir
 defmodule MyAppWeb.UserController do
   use MyAppWeb, :controller
-  use Jido.BoundaryGuard
+  use Jido.PerimeterGuard
   
   defcontract :create_params do
     required :user, :map do
@@ -497,7 +497,7 @@ defmodule MyAppWeb.UserController do
   
   @guard function: :create, input: :create_params
   def create(conn, params) do
-    # Params are validated at boundary
+    # Params are validated at perimeter
     case MyApp.Actions.CreateUser.run(params.user, build_context(conn)) do
       {:ok, result} ->
         conn
@@ -517,7 +517,7 @@ end
 ```elixir
 defmodule MyApp.ProcessingServer do
   use GenServer
-  use Jido.BoundaryGuard
+  use Jido.PerimeterGuard
   
   defcontract :process_request do
     required :type, :atom, in: [:sync, :async]
@@ -531,7 +531,7 @@ defmodule MyApp.ProcessingServer do
   
   @guard function: :handle_call, input: :process_request
   def handle_call({:process, request}, from, state) do
-    # Request validated at boundary
+    # Request validated at perimeter
     result = do_process(request.type, request.data)
     {:reply, result, state}
   end
@@ -590,7 +590,7 @@ defmodule Jido.ValidationCache do
 end
 ```
 
-## Testing Boundaries
+## Testing Perimeters
 
 ### Contract Testing
 
@@ -599,7 +599,7 @@ defmodule MyApp.Actions.CreateUserTest do
   use ExUnit.Case
   use Jido.ContractTesting
   
-  describe "boundary contracts" do
+  describe "perimeter contracts" do
     contract_test MyApp.Actions.CreateUser do
       valid_inputs [
         %{name: "John", email: "john@example.com"},
@@ -629,12 +629,12 @@ end
 
 ## Conclusion
 
-The Defensive Boundary pattern provides a practical approach to type safety in Elixir that:
+The Defensive Perimeter pattern provides a practical approach to type safety in Elixir that:
 
-1. **Validates assertively** at system boundaries
+1. **Validates assertively** at system perimeters
 2. **Trusts validated data** in the interior
 3. **Fails fast** with clear error messages
 4. **Preserves Elixir idioms** and patterns
-5. **Enables metaprogramming** within safe boundaries
+5. **Enables metaprogramming** within safe perimeters
 
 By implementing these patterns, you create systems that are both flexible and robust, avoiding common antipatterns while embracing Elixir's strengths.

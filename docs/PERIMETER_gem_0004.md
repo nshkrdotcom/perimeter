@@ -157,7 +157,7 @@ end
 ```elixir
 defmodule Perimeter.Guard do
   @moduledoc """
-  Provides the `@guard` macro to enforce contracts at function boundaries.
+  Provides the `@guard` macro to enforce contracts at function perimeters.
 
   The guard is the mechanism that creates the "Defensive Perimeter." It wraps
   a function definition, creating a layer of protection that validates incoming

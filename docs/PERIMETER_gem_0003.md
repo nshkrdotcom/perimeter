@@ -17,7 +17,7 @@ This guide is a practical application of the principles found in the [Type Contr
     *   Compose, Don't Repeat
     *   Separate Validation from Business Logic
 2.  [Guard Best Practices](#2-guard-best-practices)
-    *   Guard at the System Boundary
+    *   Guard at the System Perimeter
     *   Trust the Interior
 3.  [Common Anti-Patterns to Avoid](#3-common-anti-patterns-to-avoid)
     *   Anti-Pattern: The Chain of Guards
@@ -132,7 +132,7 @@ end
 
 ## 2. Guard Best Practices
 
-### Guard at the System Boundary
+### Guard at the System Perimeter
 
 The most effective place to use `@guard` is at the entry points of your application or context. This creates the "Defensive Perimeter."
 
@@ -251,7 +251,7 @@ defmodule MyContext do
 end
 ```
 
-**Solution:** Make the unguarded function private (`defp`). This forces all external callers to go through the public, guarded function, ensuring that the contract is always enforced at the boundary.
+**Solution:** Make the unguarded function private (`defp`). This forces all external callers to go through the public, guarded function, ensuring that the contract is always enforced at the perimeter.
 
 ---
 
@@ -411,7 +411,7 @@ test "returns a validation error for invalid params" do
 end
 ```
 
-This is a powerful way to test your boundaries. You don't need to mock anything; you are directly testing the contract enforcement that will happen in production.
+This is a powerful way to test your perimeters. You don't need to mock anything; you are directly testing the contract enforcement that will happen in production.
 
 ## 3. Testing with Different Enforcement Levels
 

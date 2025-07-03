@@ -1,4 +1,4 @@
-Of course. This is an excellent idea. The "Defensive Boundary / Offensive Interior" pattern is a powerful, reusable concept. I will structure this as a new library called `Perimeter`.
+Of course. This is an excellent idea. The "Defensive Perimeter / Offensive Interior" pattern is a powerful, reusable concept. I will structure this as a new library called `Perimeter`.
 
 Here are the key documentation files for the `Perimeter` library, which directly reference and build upon the philosophy outlined in your 20250702 documents.
 
@@ -17,7 +17,7 @@ defmodule Perimeter.MixProject do
       elixir: "~> 1.13",
       start_permanent: Mix.env() == :prod,
       deps: deps(),
-      description: "A library for defining and enforcing type contracts at your Elixir application's boundaries.",
+      description: "A library for defining and enforcing type contracts at your Elixir application's perimeters.",
       package: [
         maintainers: ["Your Name"],
         licenses: ["Apache-2.0"],
@@ -51,16 +51,16 @@ end
 [![Hex.pm](https://img.shields.io/hexpm/v/perimeter.svg)](https://hex.pm/packages/perimeter)
 [![CI](https://github.com/your-org/perimeter/actions/workflows/ci.yml/badge.svg)](https://github.com/your-org/perimeter/actions/workflows/ci.yml)
 
-**A library for defining and enforcing explicit type contracts at your Elixir application's boundaries.**
+**A library for defining and enforcing explicit type contracts at your Elixir application's perimeters.**
 
 Perimeter allows you to embrace Elixir's dynamic nature and metaprogramming power while providing strong, runtime guarantees where they matter most: at the edge of your system.
 
-It is the public implementation of the **"Defensive Boundary / Offensive Interior"** pattern, designed to solve the challenges of type safety in complex, metaprogramming-heavy frameworks.
+It is the public implementation of the **"Defensive Perimeter / Offensive Interior"** pattern, designed to solve the challenges of type safety in complex, metaprogramming-heavy frameworks.
 
 ## Key Features
 
 *   **Declarative Contracts:** Define the "shape" of your data using a simple, powerful `defcontract` DSL.
-*   **Boundary Guards:** Enforce contracts at function boundaries with a single `@guard` attribute.
+*   **Perimeter Guards:** Enforce contracts at function perimeters with a single `@guard` attribute.
 *   **Gradual Enforcement:** Start with logging (`:log`), move to warnings (`:warn`), and finally to strict enforcement (`:strict`), allowing for safe, incremental adoption in existing codebases.
 *   **Structured Errors:** Get detailed, structured error information on contract violations.
 *   **Anti-Pattern Avoidance:** Encourages best practices and helps eliminate common Elixir anti-patterns.
@@ -126,9 +126,9 @@ end
 
 ## The Perimeter Philosophy
 
-Perimeter is built on the **"Defensive Boundary / Offensive Interior"** design pattern. This pattern acknowledges a fundamental truth of large Elixir systems: trying to achieve perfect static type safety everywhere is often at odds with the language's most powerful features (like metaprogramming).
+Perimeter is built on the **"Defensive Perimeter / Offensive Interior"** design pattern. This pattern acknowledges a fundamental truth of large Elixir systems: trying to achieve perfect static type safety everywhere is often at odds with the language's most powerful features (like metaprogramming).
 
-Instead, we focus our efforts on the boundaries.
+Instead, we focus our efforts on the perimeters.
 
 1.  **The Defensive Perimeter:** This is the entry point to your module or system (e.g., a controller action, a public API of a context, a GenServer's `handle_call`). Here, we use `Perimeter.Guard` to strictly validate all incoming data against an explicit `Perimeter.Contract`.
 
@@ -150,7 +150,7 @@ Perimeter is designed to programmatically guide you away from common anti-patter
 | **Dynamic Atom Creation** | Contracts can validate incoming strings against an explicit list of allowed values, which can then be safely converted to existing atoms. |
 | **Complex `else` Clauses in `with`** | Promotes a single, clear validation step at the beginning of a function, simplifying the "happy path" logic within the `with` block. |
 | **Long Parameter Lists** | Encourages grouping related parameters into a map that is validated by a single, clear contract. |
-| **Non-Assertive Pattern Matching** | By validating the data shape at the boundary, you can write assertive, non-defensive code in the function interior, letting it crash on unexpected (and now truly exceptional) data shapes. |
+| **Non-Assertive Pattern Matching** | By validating the data shape at the perimeter, you can write assertive, non-defensive code in the function interior, letting it crash on unexpected (and now truly exceptional) data shapes. |
 
 ---
 
@@ -166,15 +166,15 @@ defmodule Perimeter do
 
   ## The Perimeter Philosophy
 
-  Perimeter implements the **"Defensive Boundary / Offensive Interior"**
+  Perimeter implements the **"Defensive Perimeter / Offensive Interior"**
   design pattern. This pattern advocates for strict, explicit data validation at
-  the boundaries of your system, which in turn allows for more flexible,
-  assertive, and dynamic code within those boundaries.
+  the perimeters of your system, which in turn allows for more flexible,
+  assertive, and dynamic code within those perimeters.
 
   The core workflow is:
   1. **`use Perimeter`** to bring in the necessary tools.
   2. **`defcontract/2`** to define the expected shape of your data.
-  3. **`@guard/1`** to enforce that contract on a function boundary.
+  3. **`@guard/1`** to enforce that contract on a function perimeter.
 
   By adopting this pattern, you gain runtime type safety where it's most
   critical, without sacrificing the metaprogramming power and flexibility
@@ -270,7 +270,7 @@ end
 ```elixir
 defmodule Perimeter.Guard do
   @moduledoc """
-  Enforces contracts at function boundaries.
+  Enforces contracts at function perimeters.
 
   The `guard/1` macro wraps a function, creating a "Defensive Perimeter"
   around it. It intercepts the function call, validates the arguments

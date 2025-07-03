@@ -2,7 +2,7 @@
 
 ## Overview
 
-This guide demonstrates how to implement robust error handling within the "Defensive Boundary / Offensive Interior" pattern. It shows how type-safe error handling can prevent common antipatterns while providing clear, actionable error information.
+This guide demonstrates how to implement robust error handling within the "Defensive Perimeter / Offensive Interior" pattern. It shows how type-safe error handling can prevent common antipatterns while providing clear, actionable error information.
 
 ## Core Principles of Type-Safe Error Handling
 
@@ -78,17 +78,17 @@ defmodule Jido.Error do
 end
 ```
 
-### 2. Error Boundaries with Pattern Matching
+### 2. Error Perimeters with Pattern Matching
 
 Avoid complex `else` clauses by using specific error handling:
 
 ```elixir
-defmodule ErrorBoundaryPatterns do
+defmodule ErrorPerimeterPatterns do
   use Jido.TypeContract
   
   # Instead of complex with/else
-  def process_with_boundaries(params) do
-    # Each boundary returns typed errors
+  def process_with_perimeters(params) do
+    # Each perimeter returns typed errors
     with {:ok, validated} <- validate_input(params),
          {:ok, authorized} <- check_authorization(validated),
          {:ok, result} <- execute_action(authorized) do
@@ -96,7 +96,7 @@ defmodule ErrorBoundaryPatterns do
     end
   end
   
-  # Boundary functions return specific error types
+  # Perimeter functions return specific error types
   defp validate_input(params) do
     case validate_contract(:input, params) do
       {:ok, valid} -> 
@@ -248,7 +248,7 @@ end
 
 ### Pattern 2: Error Recovery and Compensation
 
-Implement recovery strategies at boundaries:
+Implement recovery strategies at perimeters:
 
 ```elixir
 defmodule ErrorRecovery do
@@ -319,7 +319,7 @@ end
 
 ### Pattern 3: Error Context Enrichment
 
-Add context to errors as they propagate through boundaries:
+Add context to errors as they propagate through perimeters:
 
 ```elixir
 defmodule ErrorContextEnrichment do
@@ -327,7 +327,7 @@ defmodule ErrorContextEnrichment do
   
   defmodule ContextualError do
     @moduledoc """
-    Enriches errors with contextual information at each boundary.
+    Enriches errors with contextual information at each perimeter.
     """
     
     def with_context(error_or_result, context) do
@@ -344,14 +344,14 @@ defmodule ErrorContextEnrichment do
     defp add_context(%Jido.Error{} = error, context) do
       %{error |
         context: Map.merge(error.context, context),
-        stacktrace: maybe_add_boundary_frame(error.stacktrace)
+        stacktrace: maybe_add_perimeter_frame(error.stacktrace)
       }
     end
     
     defp wrap_with_context(error, context) do
       Jido.Error.new(%{
         type: :system_error,
-        message: "Wrapped error at boundary",
+        message: "Wrapped error at perimeter",
         details: %{original_error: error},
         context: context
       })
@@ -372,15 +372,15 @@ defmodule ErrorContextEnrichment do
     end
   end
   
-  # Usage in boundaries
+  # Usage in perimeters
   def process_order(order_params) do
     order_params
     |> validate_order()
-    |> ContextualError.with_context(%{boundary: :order_validation})
+    |> ContextualError.with_context(%{perimeter: :order_validation})
     |> calculate_pricing()
-    |> ContextualError.with_context(%{boundary: :pricing})
+    |> ContextualError.with_context(%{perimeter: :pricing})
     |> check_inventory()
-    |> ContextualError.with_context(%{boundary: :inventory})
+    |> ContextualError.with_context(%{perimeter: :inventory})
     |> ContextualError.with_telemetry(:order_processing)
   end
 end
@@ -388,7 +388,7 @@ end
 
 ### Pattern 4: Type-Safe Error Transformation
 
-Transform errors between different boundary types:
+Transform errors between different perimeter types:
 
 ```elixir
 defmodule ErrorTransformation do
@@ -686,7 +686,7 @@ defmodule ErrorObservability do
       [
         [:jido, :error, :validation],
         [:jido, :error, :execution],
-        [:jido, :error, :boundary]
+        [:jido, :error, :perimeter]
       ],
       &handle_error_event/4,
       nil
@@ -716,7 +716,7 @@ defmodule ErrorObservability do
     
     Alert.send(%{
       level: :critical,
-      title: "Critical error in #{error.context[:boundary]}",
+      title: "Critical error in #{error.context[:perimeter]}",
       details: error
     })
   end
@@ -728,7 +728,7 @@ end
 
 Type-safe error handling provides:
 
-1. **Clear Error Boundaries**: Errors are caught and typed at system boundaries
+1. **Clear Error Perimeters**: Errors are caught and typed at system perimeters
 2. **Structured Error Information**: Rich error types with context
 3. **Avoid Antipatterns**: No defensive programming or complex error handling
 4. **Better Debugging**: Clear error traces with context

@@ -2,7 +2,7 @@ Building robust, complex systems in any language requires a deliberate approach 
 
 While Elixir is a dynamically typed language, successful large-scale applications are not built by abandoning the principles of typing. Instead, Elixir encourages a powerful, practical approach to data integrity and system design that relies on explicit contracts and data structures over a mandatory static type system. This is achieved through a combination of:
 
-*   **Pattern Matching:** Asserting the "shape" of data at every boundary.
+*   **Pattern Matching:** Asserting the "shape" of data at every perimeter.
 *   **Structs:** Defining clear, named data structures with known fields.
 *   **Function Signatures:** Using multi-clause functions to handle different data patterns explicitly.
 *   **Specifications (`@spec`)**: Providing a layer of gradual typing for static analysis with tools like Dialyzer.

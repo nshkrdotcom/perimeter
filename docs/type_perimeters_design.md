@@ -1,14 +1,14 @@
-# Jido Type Boundaries Design: Defensive Perimeter with Offensive Interior
+# Jido Type Perimeters Design: Defensive Perimeter with Offensive Interior
 
 ## Executive Summary
 
-This document presents an innovative approach to type safety in Elixir metaprogramming, specifically designed for the Jido framework. We introduce a **"Defensive Boundary / Offensive Interior"** pattern that allows maximum metaprogramming flexibility while maintaining strict type contracts at system boundaries.
+This document presents an innovative approach to type safety in Elixir metaprogramming, specifically designed for the Jido framework. We introduce a **"Defensive Perimeter / Offensive Interior"** pattern that allows maximum metaprogramming flexibility while maintaining strict type contracts at system perimeters.
 
 ## Core Innovation: Type Enforcement Zones
 
 ### The Three-Zone Model
 
-1. **Defensive Perimeter (Zone 1)**: Strict type validation at API boundaries
+1. **Defensive Perimeter (Zone 1)**: Strict type validation at API perimeters
 2. **Transition Layer (Zone 2)**: Type transformation and normalization
 3. **Offensive Interior (Zone 3)**: Unrestricted metaprogramming with runtime guarantees
 
@@ -32,7 +32,7 @@ This document presents an innovative approach to type safety in Elixir metaprogr
 ```elixir
 defmodule Jido.TypeContract do
   @moduledoc """
-  Defines compile-time type contracts that are enforced at runtime boundaries.
+  Defines compile-time type contracts that are enforced at runtime perimeters.
   """
   
   defmacro defcontract(name, do: block) do
@@ -49,23 +49,23 @@ defmodule Jido.TypeContract do
 end
 ```
 
-### 2. Runtime Boundary Guards
+### 2. Runtime Perimeter Guards
 
 ```elixir
-defmodule Jido.BoundaryGuard do
+defmodule Jido.PerimeterGuard do
   @moduledoc """
-  Enforces type contracts at runtime boundaries using pluggable validation strategies.
+  Enforces type contracts at runtime perimeters using pluggable validation strategies.
   """
   
-  defmacro guard_boundary(function_name, contract_name) do
+  defmacro guard_perimeter(function_name, contract_name) do
     quote do
       defoverridable [{unquote(function_name), 2}]
       
       def unquote(function_name)(params, context) do
-        case Jido.BoundaryGuard.validate_input(__MODULE__, unquote(contract_name), params, context) do
+        case Jido.PerimeterGuard.validate_input(__MODULE__, unquote(contract_name), params, context) do
           {:ok, validated_params, validated_context} ->
             result = super(validated_params, validated_context)
-            Jido.BoundaryGuard.validate_output(__MODULE__, unquote(contract_name), result)
+            Jido.PerimeterGuard.validate_output(__MODULE__, unquote(contract_name), result)
             
           {:error, violations} ->
             {:error, Jido.Error.validation_error("Contract violation", violations)}
@@ -103,19 +103,19 @@ end
 
 ## Practical Implementation Strategy
 
-### Phase 1: Boundary Identification
+### Phase 1: Perimeter Identification
 
-1. **Action Boundaries**
+1. **Action Perimeters**
    - Entry: `Action.run/2`
    - Exit: Action result tuples
    - Contract: Input schema + Output schema
 
-2. **Agent Boundaries**
+2. **Agent Perimeters**
    - Entry: `Agent.plan/3`, `Agent.run/1`
    - Exit: `Agent.result`
    - Contract: State schema + Instruction validation
 
-3. **Instruction Boundaries**
+3. **Instruction Perimeters**
    - Entry: `Instruction.normalize/3`
    - Exit: Normalized instruction structs
    - Contract: Action module validation + Params validation
@@ -143,10 +143,10 @@ defmodule MyAction do
   end
   
   @impl true
-  guard_boundary :run, :input
+  guard_perimeter :run, :input
   def run(params, context) do
     # Interior zone - full metaprogramming freedom
-    # Types are already validated at boundary
+    # Types are already validated at perimeter
   end
 end
 ```
@@ -186,7 +186,7 @@ end
 | `Instruction.t()` | Action module | Reference | Module behavior check |
 | `Agent.state()` | User-defined map | Schema-based | NimbleOptions validation |
 
-### Boundary Crossing Rules
+### Perimeter Crossing Rules
 
 | From Zone | To Zone | Required Validation | Transformation |
 |-----------|---------|-------------------|----------------|
@@ -207,15 +207,15 @@ end
 
 ## Custom Credo Checks
 
-### 1. Boundary Violation Check
+### 1. Perimeter Violation Check
 
 ```elixir
-defmodule Credo.Check.Warning.TypeBoundaryViolation do
+defmodule Credo.Check.Warning.TypePerimeterViolation do
   use Credo.Check
   
   def run(source_file, params) do
-    # Detect direct field access across module boundaries
-    # Flag any code that bypasses boundary guards
+    # Detect direct field access across module perimeters
+    # Flag any code that bypasses perimeter guards
   end
 end
 ```
@@ -323,16 +323,16 @@ end
 ## Benefits of This Approach
 
 1. **Practical**: Works with existing Elixir tooling
-2. **Flexible**: Allows full metaprogramming within boundaries
+2. **Flexible**: Allows full metaprogramming within perimeters
 3. **Safe**: Enforces contracts at critical points
-4. **Performant**: Validation only at boundaries, not throughout
+4. **Performant**: Validation only at perimeters, not throughout
 5. **Gradual**: Can be adopted incrementally
 6. **Debuggable**: Clear violation reports with context
 
 ## Next Steps
 
 1. Implement core `Jido.TypeContract` module
-2. Create boundary guard macros
-3. Develop Credo checks for boundary violations
+2. Create perimeter guard macros
+3. Develop Credo checks for perimeter violations
 4. Build development-mode type checker
 5. Create migration guide for existing code

@@ -17,7 +17,7 @@ This approach is heavily inspired by the **Strangler Fig Pattern**, where new, r
 The goal of migration is to move from **implicit assumptions** about your data to **explicit, enforced contracts**.
 
 -   **Before:** Your functions defensively check data, assuming it might be wrong.
--   **After:** Your functions assertively use data, knowing it has been validated at the boundary.
+-   **After:** Your functions assertively use data, knowing it has been validated at the perimeter.
 
 ## Phase 1: Observe and Log (Weeks 1-2)
 
@@ -32,13 +32,13 @@ In your `config/config.exs`, set the default enforcement level to `:log`. This e
 config :perimeter, enforcement_level: :log
 ```
 
-**Step 2: Identify a Critical Boundary**
+**Step 2: Identify a Critical Perimeter**
 
 Choose a single, important entry point to your system. A great candidate is a key Phoenix controller action or a primary function in one of your core contexts.
 
 **Step 3: Write a "Shadow" Contract**
 
-Define a contract that you *believe* represents the data passing through that boundary. This is a hypothesis.
+Define a contract that you *believe* represents the data passing through that perimeter. This is a hypothesis.
 
 ```elixir
 defmodule MyApp.Accounts do
@@ -129,11 +129,11 @@ def create_user(params) do
 end
 ```
 
-Now, any future call with invalid data will be rejected at the boundary, protecting your core logic completely.
+Now, any future call with invalid data will be rejected at the perimeter, protecting your core logic completely.
 
 **Step 2: Repeat the Process**
 
-Choose the next boundary in your application and repeat the process, starting from Phase 1. Over time, you will build a perimeter of explicit, enforced contracts around your entire system.
+Choose the next perimeter in your application and repeat the process, starting from Phase 1. Over time, you will build a perimeter of explicit, enforced contracts around your entire system.
 
 ## Migration for Libraries
 
@@ -154,7 +154,7 @@ This document outlines the planned future direction for the `Perimeter` library,
 
 ## 1.0 - "Foundations of an Idiomatic System"
 
-The 1.0 release focuses on providing a complete, robust implementation of the **Defensive Boundary** design pattern.
+The 1.0 release focuses on providing a complete, robust implementation of the **Defensive Perimeter** design pattern.
 
 -   [x] **Core Contracts:** `defcontract`, `required`, `optional` DSL.
 -   [x] **Core Guarding:** `@guard` macro with configurable enforcement.
@@ -180,7 +180,7 @@ The next series of minor releases will focus on making `Perimeter` a seamless pa
     - A standard set of `:telemetry` events for tracking validation performance, failure rates per contract, and enforcement level activity.
     - A default `LiveDashboard` page for visualizing `Perimeter` metrics.
 
-## 2.0 - "Intelligent Boundaries"
+## 2.0 - "Intelligent Perimeters"
 
 The next major release will explore making the library smarter and more powerful, potentially with breaking changes that simplify the API.
 

@@ -52,9 +52,9 @@
 | | `%Instruction{}` | All fields properly typed | Normalized instruction |
 | `instruction_list()` | `[instruction()]` | No nested lists allowed | Batch operations |
 
-### Type Validation Boundaries
+### Type Validation Perimeters
 
-| Boundary | Validated Types | Validation Method | Enforcement Level |
+| Perimeter | Validated Types | Validation Method | Enforcement Level |
 |----------|----------------|-------------------|-------------------|
 | Action Entry | `params :: map()` | Schema validation | Strict |
 | Action Exit | `result :: map()` | Output schema validation | Configurable |
@@ -122,7 +122,7 @@
 |--------------|------|------------------|------------|
 | Validation | `:validation_error` | Action -> Exec -> Agent | `{:error, Error.t()}` |
 | Execution | `:execution_error` | Action runtime -> Exec | `{:error, Error.t()}` |
-| Timeout | `:timeout` | Exec boundary -> Agent | `{:error, Error.t()}` |
+| Timeout | `:timeout` | Exec perimeter -> Agent | `{:error,            Error.t()}` |
 | Planning | `:planning_error` | Agent planner -> Result | `{:error, Error.t()}` |
 
 ### Type Safety Guarantees

@@ -85,7 +85,7 @@ This creates type confusion where:
 - Runtime uses duck typing (works fine)
 - Dialyzer sees strict structural types (fails)
 
-### 4. **Type Erasure at Module Boundaries**
+### 4. **Type Erasure at Module Perimeters**
 
 When agent modules call each other or interact with the server:
 
@@ -145,7 +145,7 @@ end
 **Compile-time (Fails):**
 - Dialyzer performs strict structural typing
 - Each struct is a distinct type
-- Cannot prove type safety across module boundaries
+- Cannot prove type safety across module perimeters
 
 ### The Server State Wrapping Issue
 

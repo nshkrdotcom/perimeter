@@ -2,7 +2,7 @@
 
 ## Overview
 
-The Jido Type Enforcement Library provides a practical, lightweight system for runtime type validation in Elixir applications. It implements the "Defensive Boundary / Offensive Interior" pattern, allowing unrestricted metaprogramming within type-safe boundaries.
+The Jido Type Enforcement Library provides a practical, lightweight system for runtime type validation in Elixir applications. It implements the "Defensive Perimeter / Offensive Interior" pattern, allowing unrestricted metaprogramming within type-safe perimeters.
 
 ## Core Modules
 
@@ -13,7 +13,7 @@ The Jido Type Enforcement Library provides a practical, lightweight system for r
 ```elixir
 defmodule Jido.TypeContract do
   @moduledoc """
-  Provides macros for defining type contracts that are enforced at module boundaries.
+  Provides macros for defining type contracts that are enforced at module perimeters.
   Contracts are compiled into efficient validation functions.
   """
   
@@ -66,14 +66,14 @@ defmodule Jido.TypeContract do
 end
 ```
 
-### 2. `Jido.BoundaryGuard`
+### 2. `Jido.PerimeterGuard`
 
-**Purpose**: Enforce contracts at function boundaries with minimal overhead.
+**Purpose**: Enforce contracts at function perimeters with minimal overhead.
 
 ```elixir
-defmodule Jido.BoundaryGuard do
+defmodule Jido.PerimeterGuard do
   @moduledoc """
-  Provides boundary enforcement for type contracts with configurable
+  Provides perimeter enforcement for type contracts with configurable
   validation levels and detailed error reporting.
   """
   
@@ -87,7 +87,7 @@ defmodule Jido.BoundaryGuard do
   }
   
   @doc """
-  Guards a function boundary with input/output contracts.
+  Guards a function perimeter with input/output contracts.
   
   ## Options
   

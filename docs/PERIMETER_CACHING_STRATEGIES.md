@@ -1,8 +1,8 @@
-# Boundary Library Caching Strategies
+# Perimeter Library Caching Strategies
 
 ## Overview
 
-This document outlines caching strategies for the `boundary` library to ensure minimal performance overhead while maintaining correctness. The caching system is designed to optimize repeated validations without sacrificing the safety guarantees of the defensive boundary pattern.
+This document outlines caching strategies for the `perimeter` library to ensure minimal performance overhead while maintaining correctness. The caching system is designed to optimize repeated validations without sacrificing the safety guarantees of the defensive perimeter pattern.
 
 ## Core Caching Principles
 
@@ -28,7 +28,7 @@ Caching decisions balance:
 ### 1. Contract Compilation Cache
 
 ```elixir
-defmodule Boundary.Contract.Compiler do
+defmodule Perimeter.Contract.Compiler do
   @moduledoc """
   Compiles contracts into optimized validation functions at compile time.
   """
@@ -67,7 +67,7 @@ end
 ### 2. Pattern Match Optimization
 
 ```elixir
-defmodule Boundary.Contract.PatternOptimizer do
+defmodule Perimeter.Contract.PatternOptimizer do
   @moduledoc """
   Optimizes contracts into efficient pattern matches.
   """
@@ -105,14 +105,14 @@ end
 ### 1. Validation Result Cache
 
 ```elixir
-defmodule Boundary.Cache do
+defmodule Perimeter.Cache do
   @moduledoc """
   ETS-based cache for validation results with configurable TTL.
   """
   
   use GenServer
   
-  @table_name :boundary_validation_cache
+  @table_name :perimeter_validation_cache
   @default_ttl :infinity
   @max_cache_size 10_000
   
@@ -144,7 +144,7 @@ defmodule Boundary.Cache do
   @doc """
   Cache-aware validation with TTL support.
   """
-  def validate_with_cache(module, contract, data, opts \\ []) do
+  def validate_with_cache(module, contract, data, opts \ []) do
     cache_key = compute_cache_key(module, contract, data)
     
     case lookup_cache(cache_key) do
@@ -154,7 +154,7 @@ defmodule Boundary.Cache do
         
       :miss ->
         bump_stats(:miss)
-        result = Boundary.Validator.validate_direct(module, contract, data)
+        result = Perimeter.Validator.validate_direct(module, contract, data)
         cache_result(cache_key, result, opts)
         result
     end
@@ -206,7 +206,7 @@ end
 ### 2. Partial Validation Cache
 
 ```elixir
-defmodule Boundary.Cache.Partial do
+defmodule Perimeter.Cache.Partial do
   @moduledoc """
   Caches validation results for parts of nested structures.
   """
@@ -223,7 +223,7 @@ defmodule Boundary.Cache.Partial do
         
       _ ->
         # No caching for non-map data
-        Boundary.Validator.validate_direct(data, contract)
+        Perimeter.Validator.validate_direct(data, contract)
     end
   end
   
@@ -244,12 +244,12 @@ end
 ### 3. Contract-Specific Caching
 
 ```elixir
-defmodule Boundary.Cache.ContractSpecific do
+defmodule Perimeter.Cache.ContractSpecific do
   @moduledoc """
   Provides contract-specific caching strategies.
   """
   
-  defmacro enable_caching(contract_name, opts \\ []) do
+  defmacro enable_caching(contract_name, opts \ []) do
     strategy = Keyword.get(opts, :strategy, :full)
     ttl = Keyword.get(opts, :ttl, :timer.minutes(5))
     
@@ -288,7 +288,7 @@ end
 ### 1. Content-Based Keys
 
 ```elixir
-defmodule Boundary.Cache.Keys do
+defmodule Perimeter.Cache.Keys do
   @moduledoc """
   Efficient cache key generation strategies.
   """
@@ -329,12 +329,12 @@ end
 ### 2. Hierarchical Cache Keys
 
 ```elixir
-defmodule Boundary.Cache.Hierarchical do
+defmodule Perimeter.Cache.Hierarchical do
   @moduledoc """
   Hierarchical caching for nested validations.
   """
   
-  def build_cache_hierarchy(data, path \\ []) do
+  def build_cache_hierarchy(data, path \ []) do
     case data do
       map when is_map(map) ->
         # Build hierarchy of cache keys
@@ -370,7 +370,7 @@ end
 ### 1. Compile-Time Warming
 
 ```elixir
-defmodule Boundary.Cache.Warming do
+defmodule Perimeter.Cache.Warming do
   @moduledoc """
   Pre-warm caches with common validations.
   """
@@ -382,7 +382,7 @@ defmodule Boundary.Cache.Warming do
       def warm_validation_cache do
         # Validate examples at module load time
         Enum.each(unquote(examples), fn example ->
-          Boundary.Validator.validate(__MODULE__, unquote(contract_name), example)
+          Perimeter.Validator.validate(__MODULE__, unquote(contract_name), example)
         end)
         :ok
       end
@@ -392,7 +392,7 @@ end
 
 # Usage
 defmodule MyModule do
-  use Boundary.Contract
+  use Perimeter.Contract
   
   defcontract :user do
     required :email, :string
@@ -410,7 +410,7 @@ end
 ### 2. Runtime Cache Warming
 
 ```elixir
-defmodule Boundary.Cache.RuntimeWarming do
+defmodule Perimeter.Cache.RuntimeWarming do
   @moduledoc """
   Warms cache based on actual usage patterns.
   """
@@ -423,7 +423,7 @@ defmodule Boundary.Cache.RuntimeWarming do
   
   def init(_opts) do
     # Track validation patterns
-    :ets.new(:boundary_usage_patterns, [:set, :public, :named_table])
+    :ets.new(:perimeter_usage_patterns, [:set, :public, :named_table])
     
     # Periodically analyze and warm cache
     schedule_analysis()
@@ -433,7 +433,7 @@ defmodule Boundary.Cache.RuntimeWarming do
   
   def track_validation(module, contract, data) do
     pattern = extract_pattern(data)
-    :ets.update_counter(:boundary_usage_patterns, {module, contract, pattern}, 1, {{module, contract, pattern}, 0})
+    :ets.update_counter(:perimeter_usage_patterns, {module, contract, pattern}, 1, {{module, contract, pattern}, 0})
   end
   
   defp extract_pattern(data) when is_map(data) do
@@ -450,12 +450,12 @@ defmodule Boundary.Cache.RuntimeWarming do
   end
   
   defp warm_frequent_patterns do
-    :ets.tab2list(:boundary_usage_patterns)
+    :ets.tab2list(:perimeter_usage_patterns)
     |> Enum.filter(fn {{_mod, _contract, _pattern}, count} -> count > 100 end)
     |> Enum.each(fn {{mod, contract, pattern}, _count} ->
       # Generate and validate synthetic data matching pattern
       synthetic_data = generate_from_pattern(pattern)
-      Boundary.Validator.validate(mod, contract, synthetic_data)
+      Perimeter.Validator.validate(mod, contract, synthetic_data)
     end)
   end
 end
@@ -466,7 +466,7 @@ end
 ### 1. TTL-Based Invalidation
 
 ```elixir
-defmodule Boundary.Cache.TTL do
+defmodule Perimeter.Cache.TTL do
   @moduledoc """
   Time-based cache invalidation.
   """
@@ -477,14 +477,14 @@ defmodule Boundary.Cache.TTL do
     # ETS match spec for expired entries
     match_spec = [
       {
-        {:"$1", :"$2", :"$3"},
+        {:_,"$2",:"$3"},
         [{:<, :"$3", now}],
         [:"$1"]
       }
     ]
     
-    expired_keys = :ets.select(:boundary_validation_cache, match_spec)
-    Enum.each(expired_keys, &:ets.delete(:boundary_validation_cache, &1))
+    expired_keys = :ets.select(:perimeter_validation_cache, match_spec)
+    Enum.each(expired_keys, &:ets.delete(:perimeter_validation_cache, &1))
   end
   
   # Run periodically
@@ -497,7 +497,7 @@ end
 ### 2. Memory-Pressure Invalidation
 
 ```elixir
-defmodule Boundary.Cache.MemoryPressure do
+defmodule Perimeter.Cache.MemoryPressure do
   @moduledoc """
   Responds to memory pressure by evicting cache entries.
   """
@@ -518,17 +518,17 @@ defmodule Boundary.Cache.MemoryPressure do
   end
   
   defp evict_percentage(percent) do
-    cache_size = :ets.info(:boundary_validation_cache, :size)
+    cache_size = :ets.info(:perimeter_validation_cache, :size)
     to_evict = trunc(cache_size * percent)
     
     # Evict oldest entries first
     :ets.foldl(
       fn entry, count when count < to_evict ->
-        :ets.delete(:boundary_validation_cache, elem(entry, 0))
+        :ets.delete(:perimeter_validation_cache, elem(entry, 0))
         count + 1
       end,
       0,
-      :boundary_validation_cache
+      :perimeter_validation_cache
     )
   end
 end
@@ -539,21 +539,21 @@ end
 ### 1. Cache Metrics
 
 ```elixir
-defmodule Boundary.Cache.Metrics do
+defmodule Perimeter.Cache.Metrics do
   @moduledoc """
   Telemetry integration for cache monitoring.
   """
   
   def emit_cache_metrics do
     metrics = %{
-      size: :ets.info(:boundary_validation_cache, :size),
-      memory: :ets.info(:boundary_validation_cache, :memory),
+      size: :ets.info(:perimeter_validation_cache, :size),
+      memory: :ets.info(:perimeter_validation_cache, :memory),
       hit_rate: calculate_hit_rate(),
       avg_lookup_time: calculate_avg_lookup_time()
     }
     
     :telemetry.execute(
-      [:boundary, :cache, :snapshot],
+      [:perimeter, :cache, :snapshot],
       metrics,
       %{}
     )
@@ -561,7 +561,7 @@ defmodule Boundary.Cache.Metrics do
   
   def track_lookup(key, result, duration) do
     :telemetry.execute(
-      [:boundary, :cache, :lookup],
+      [:perimeter, :cache, :lookup],
       %{duration: duration},
       %{key: key, result: result}
     )
@@ -572,7 +572,7 @@ end
 ### 2. Adaptive Caching
 
 ```elixir
-defmodule Boundary.Cache.Adaptive do
+defmodule Perimeter.Cache.Adaptive do
   @moduledoc """
   Adapts caching strategy based on runtime metrics.
   """
@@ -610,7 +610,7 @@ end
 
 ```elixir
 # config/config.exs
-config :boundary,
+config :perimeter,
   cache: [
     enabled: true,
     strategy: :ets,  # :ets | :persistent_term | :none
@@ -622,13 +622,13 @@ config :boundary,
   ]
 
 # Per-environment configuration
-config :boundary, :prod,
+config :perimeter, :prod,
   cache: [
     strategy: :persistent_term,  # Better for read-heavy production
     compression: true
   ]
 
-config :boundary, :test,
+config :perimeter, :test,
   cache: [
     enabled: false  # Disable caching in tests for predictability
   ]
@@ -658,4 +658,4 @@ config :boundary, :test,
 
 ## Summary
 
-The caching strategy for `boundary` leverages Elixir's immutability to provide efficient validation caching without sacrificing correctness. By combining compile-time optimization with runtime result caching, the library achieves minimal overhead while maintaining the strong guarantees of the defensive boundary pattern.
+The caching strategy for `perimeter` leverages Elixir's immutability to provide efficient validation caching without sacrificing correctness. By combining compile-time optimization with runtime result caching, the library achieves minimal overhead while maintaining the strong guarantees of the defensive perimeter pattern.
