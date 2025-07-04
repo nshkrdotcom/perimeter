@@ -1,7 +1,3 @@
-Of course. Here is a `README.md` for the `Perimeter` library. It is designed to serve as the main entry point for the project, with a focus on the well-documented design and philosophy, linking out to the more detailed documents as requested.
-
-***
-
 # Perimeter
 
 [![Hex.pm](https://img.shields.io/hexpm/v/perimeter.svg?style=flat-square)](https://hex.pm/packages/perimeter)
