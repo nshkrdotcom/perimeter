@@ -8,6 +8,8 @@
 # Added by Gemini
 /doc
 perimeter-*.tar
+# Test coverage
+/cover
 # Operating system files
 .DS_Store
 ehthumbs.db
