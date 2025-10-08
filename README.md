@@ -1,77 +1,272 @@
 # Perimeter
 
-[![Hex.pm](https://img.shields.io/hexpm/v/perimeter.svg?style=flat-square)](https://hex.pm/packages/perimeter)
-[![CI](https://img.shields.io/github/actions/workflow/status/your-org/perimeter/ci.yml?branch=main&style=flat-square)](https://github.com/your-org/perimeter/actions)
-[![Hex Docs](https://img.shields.io/badge/hex-docs-blue.svg?style=flat-square)](https://hexdocs.pm/perimeter/)
-
 **An implementation of the "Defensive Perimeter / Offensive Interior" design pattern for Elixir.**
 
 Perimeter helps you build robust and maintainable applications by enforcing explicit data contracts at your system's perimeters. This allows you to write simple, assertive, and highly dynamic code in your core logic with confidence.
 
-It is designed according to the principles of idiomatic Elixir: favoring composition, decoupling behavior and state, and using the least expressive tool for the job.
+## Installation
 
-## The Problem: Complexity at the Edges
+**Note**: This package is not yet published to Hex. To use it, add it as a Git dependency:
 
-In any large system, modules need to exchange data. This often leads to defensive coding, which is verbose, error-prone, and mixes validation with business logic:
+```elixir
+def deps do
+  [
+    {:perimeter, github: "nshkrdotcom/perimeter"}
+  ]
+end
+```
+
+## Quick Start
+
+```elixir
+defmodule MyApp.Accounts do
+  use Perimeter
+
+  # 1. Define a contract for your data
+  defcontract :create_user do
+    required :email, :string, format: ~r/@/
+    required :password, :string, min_length: 12
+    optional :name, :string, max_length: 100
+  end
+
+  # 2. Guard your function with the contract
+  @guard input: :create_user
+  def create_user(params) do
+    # 3. Write simple, assertive code - params are guaranteed valid!
+    {:ok, %{
+      email: params.email,
+      name: Map.get(params, :name, "Anonymous")
+    }}
+  end
+end
+
+# Valid input
+MyApp.Accounts.create_user(%{
+  email: "user@example.com",
+  password: "supersecret123"
+})
+# => {:ok, %{email: "user@example.com", name: "Anonymous"}}
+
+# Invalid input raises with clear error message
+MyApp.Accounts.create_user(%{email: "invalid", password: "short"})
+# => ** (Perimeter.ValidationError) Validation failed at perimeter with 2 violation(s):
+#      - email: does not match format
+#      - password: must be at least 12 characters (minimum length)
+```
+
+## The Problem: Defensive Coding Everywhere
+
+In any large system, modules need to exchange data. This often leads to defensive coding throughout your codebase:
 
 ```elixir
 def create_user(params) do
-  # Is email a string? Does it exist? What about the name?
+  # Defensive checks everywhere
   case get_in(params, ["user", "email"]) do
     nil -> {:error, :email_required}
     email when is_binary(email) ->
-      # ... more checks ...
-      # Finally, our core logic
+      case validate_email_format(email) do
+        :ok ->
+          case get_in(params, ["user", "password"]) do
+            nil -> {:error, :password_required}
+            password when byte_size(password) >= 12 ->
+              # Finally, our actual logic!
+              do_create_user(email, password)
+            _ -> {:error, :password_too_short}
+          end
+        :error -> {:error, :invalid_email}
+      end
     _ -> {:error, :invalid_email_type}
   end
 end
 ```
 
-## The Solution: The Perimeter Philosophy
+This code is:
+- ❌ **Verbose**: Validation mixed with business logic
+- ❌ **Error-prone**: Easy to forget checks or get them wrong
+- ❌ **Hard to maintain**: Changes require updating validation logic scattered everywhere
+- ❌ **Not reusable**: Same validations duplicated across functions
 
-Perimeter allows you to solve this problem elegantly by establishing a **Defensive Perimeter** around a trusted **Offensive Interior**.
+## The Solution: Defensive Perimeter / Offensive Interior
 
-1.  **Define a Contract:** Describe the shape of your data using a clear, declarative DSL.
-2.  **Guard the Perimeter:** Enforce the contract on your public functions.
-3.  **Write Assertive Code:** Trust the data inside your functions and use Elixir's full power.
+Perimeter implements a three-zone architecture:
+
+```
+┌─────────────────────────────────────────┐
+│       DEFENSIVE PERIMETER (@guard)      │
+│   ┌─────────────────────────────────┐   │
+│   │    TRANSITION LAYER (validate)  │   │
+│   │  ┌───────────────────────────┐  │   │
+│   │  │  OFFENSIVE INTERIOR       │  │   │
+│   │  │  (your business logic)    │  │   │
+│   │  └───────────────────────────┘  │   │
+│   └─────────────────────────────────┘   │
+└─────────────────────────────────────────┘
+```
+
+1. **Defensive Perimeter**: Guards validate all inputs before they enter your function
+2. **Transition Layer**: Automatic normalization and transformation
+3. **Offensive Interior**: Your business logic with guaranteed-valid data
+
+## Features
+
+### Comprehensive Type System
+
+- ✅ Basic types: `:string`, `:integer`, `:float`, `:boolean`, `:atom`, `:map`, `:list`
+- ✅ Typed lists: `{:list, :string}`, `{:list, :integer}`, etc.
+- ✅ Nested maps with full validation
+- ✅ Required and optional fields
+
+### Rich Constraint System
+
+**String constraints:**
+```elixir
+required :email, :string, format: ~r/@/
+required :username, :string, min_length: 3, max_length: 20
+```
+
+**Number constraints:**
+```elixir
+required :age, :integer, min: 18, max: 150
+required :price, :float, min: 0.0
+```
+
+**Enum constraints:**
+```elixir
+required :role, :atom, in: [:admin, :user, :guest]
+required :status, :string, in: ["active", "inactive"]
+```
+
+### Nested Validation
 
 ```elixir
-defmodule MyApp.Accounts do
-  use Perimeter # Imports Perimeter.Contract and Perimeter.Guard
-
-  # 1. Define the contract for incoming data
-  defcontract :create_user_params do
-    required :email, :string, format: ~r/@/
-    optional :name, :string
-  end
-
-  # 2. Guard the perimeter function
-  @guard input: :create_user_params
-  def create_user(params) do
-    # 3. Write simple, assertive code in the "Offensive Interior"
-    # We know `params` has a valid email and an optional name.
-    %User{}
-    |> User.changeset(params)
-    |> Repo.insert()
+defcontract :user do
+  required :email, :string
+  optional :address, :map do
+    required :city, :string
+    required :zip, :string, format: ~r/^\d{5}$/
+    optional :state, :string
   end
 end
 ```
 
-This approach provides the best of both worlds: the robustness of a type-safe system where it matters most, and the flexibility and power of a dynamic language in the implementation details.
-
-For a deeper dive, please read our [**Design Philosophy and Principles**](docs/PERIMETER_gem_0010.md).
-
-## Installation
-
-This package is not yet on Hex.pm. Once published, it can be installed by adding `perimeter` to your list of dependencies in `mix.exs`:
+### Clear Error Messages
 
 ```elixir
-def deps do
-  [
-    {:perimeter, "~> 0.1.0"}
-  ]
+MyApp.Accounts.create_user(%{
+  email: "invalid",
+  password: "short",
+  profile: %{age: 17}
+})
+# ** (Perimeter.ValidationError) Validation failed at perimeter with 3 violation(s):
+#   - email: does not match format
+#   - password: must be at least 12 characters (minimum length)
+#   - profile.age: must be >= 18 (minimum value)
+```
+
+## Real-World Examples
+
+### API Request Handling
+
+```elixir
+defmodule MyAPI.SearchController do
+  use Perimeter
+
+  defcontract :search_params do
+    required :query, :string, min_length: 1
+    optional :filters, :map do
+      optional :category, :atom, in: [:all, :active, :archived]
+      optional :limit, :integer, min: 1, max: 100
+    end
+  end
+
+  @guard input: :search_params
+  def search(params) do
+    # params.query, params.filters are guaranteed valid
+    MyApp.Search.run(params.query, Map.get(params, :filters, %{}))
+  end
 end
 ```
+
+### Configuration Validation
+
+```elixir
+defmodule MyApp.Config do
+  use Perimeter
+
+  defcontract :database_config do
+    required :host, :string
+    required :port, :integer, min: 1, max: 65535
+    required :database, :string
+    optional :pool_size, :integer, min: 1, max: 100
+  end
+
+  @guard input: :database_config
+  def connect(config) do
+    # config is validated - safe to use directly
+    Ecto.Repo.start_link(
+      hostname: config.host,
+      port: config.port,
+      database: config.database,
+      pool_size: Map.get(config, :pool_size, 10)
+    )
+  end
+end
+```
+
+### Data Processing Pipelines
+
+```elixir
+defmodule MyApp.DataProcessor do
+  use Perimeter
+
+  defcontract :process_input do
+    required :items, {:list, :map}
+    required :operation, :atom, in: [:transform, :filter, :aggregate]
+    optional :batch_size, :integer, min: 1, max: 1000
+  end
+
+  @guard input: :process_input
+  def process(params) do
+    params.items
+    |> Enum.chunk_every(Map.get(params, :batch_size, 100))
+    |> Enum.map(&apply_operation(&1, params.operation))
+  end
+end
+```
+
+## Documentation
+
+### Core Modules
+
+- **`Perimeter`** - Main module, use with `use Perimeter`
+- **`Perimeter.Contract`** - Define contracts with `defcontract`
+- **`Perimeter.Guard`** - Apply guards with `@guard`
+- **`Perimeter.Validator`** - Manual validation API
+- **`Perimeter.ValidationError`** - Exception raised on validation failure
+
+### Design Documentation
+
+For a deeper understanding of the philosophy and design:
+
+- [Design Philosophy and Principles](docs/PERIMETER_gem_0010.md) - The "why" behind the library
+- [Type Perimeters Design](docs/type_perimeters_design.md) - The core innovation
+- [Implementation Guide](docs/PERIMETER_LIBRARY_IMPLEMENTATION_GUIDE.md) - Comprehensive reference
+
+## Testing
+
+Perimeter has comprehensive test coverage:
+
+```bash
+mix test
+# => 117 tests, 0 failures
+```
+
+Test categories:
+- **Contract tests** (16 tests) - Contract definition and structure
+- **Validator tests** (47 tests) - Validation logic and constraints
+- **Guard tests** (26 tests) - Function perimeter enforcement
+- **Integration tests** (26 tests) - Real-world scenarios
+- **Doctests** (1 test) - Documentation examples
 
 ## Solving Common Elixir Anti-Patterns
 

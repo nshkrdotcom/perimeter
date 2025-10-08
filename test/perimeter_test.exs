@@ -3,6 +3,6 @@ defmodule PerimeterTest do
   doctest Perimeter
 
   test "returns version" do
-    assert Perimeter.version() == "0.0.1"
+    assert Perimeter.version() == "0.1.0"
   end
 end
