@@ -314,3 +314,7 @@ This library is the result of extensive research and design. The complete docume
 ## Contributing
 
 Contributions are welcome! This project is in the planning phase, and feedback on the design is highly encouraged. Please see our contribution guidelines and code of conduct. (Links to be added).
+
+## License
+
+This project is licensed under the MIT License. See [LICENSE](LICENSE) for details.

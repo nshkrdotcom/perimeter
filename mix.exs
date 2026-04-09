@@ -39,7 +39,7 @@ defmodule Perimeter.MixProject do
   defp package do
     [
       name: "perimeter",
-      licenses: ["Apache-2.0"],
+      licenses: ["MIT"],
       links: %{"GitHub" => "https://github.com/nshkrdotcom/perimeter"},
       maintainers: ["NSHkr"],
       source_url: "https://github.com/nshkrdotcom/perimeter"
