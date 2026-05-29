@@ -1,3 +1,7 @@
+<div align="center">
+  <img src="assets/logo.svg" alt="Perimeter Logo" width="200" height="200">
+</div>
+
 # Perimeter
 
 **An implementation of the "Defensive Perimeter / Offensive Interior" design pattern for Elixir.**

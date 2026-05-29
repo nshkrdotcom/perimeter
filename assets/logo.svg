@@ -1,0 +1,17 @@
+<svg width="200" height="200" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Perimeter Logo">
+  <title>Perimeter Logo</title>
+  <desc>A hexagonal logo representing the Defensive Perimeter / Offensive Interior pattern. A dark outer hexagon encloses a vibrant inner hexagon.</desc>
+  <defs>
+    <linearGradient id="innerGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#A070F8;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#6B49C8;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+  <g stroke-linejoin="round">
+    <!-- Outer Defensive Perimeter -->
+    <polygon points="100,5 187,52 187,148 100,195 13,148 13,52" fill="#3C305E"/>
+
+    <!-- Inner Offensive Core -->
+    <polygon points="100,30 161,65 161,135 100,170 39,135 39,65" fill="url(#innerGradient)"/>
+  </g>
+</svg>
